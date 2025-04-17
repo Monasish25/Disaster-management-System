@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Safety Go | Advanced Security Solutions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="30" viewBox="0 0 24 30"><path fill="%23ff0033" d="M12 0C5.373 0 0 5.373 0 12v6h12v12h6V12h12V6C30 2.686 27.314 0 24 0H12z"/></svg>'), auto;
+    }
+
+    /* Intro Animation */
+    .intro {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0f0f 0%, #000000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeOut 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      animation-delay: 3s;
+    }
+
+    .logo-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin-bottom: 2rem;
+      transition: transform 0.5s ease;
+    }
+
+    .logo-container:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .logo-outer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px solid #ff0033;
+      border-radius: 50%;
+      animation: pulse 3s ease-in-out infinite, rotate 20s linear infinite;
+      opacity: 0.7;
+    }
+
+    .logo-inner {
+      position: absolute;
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+      border: 2px solid #ff3300;
+      border-radius: 50%;
+      animation: pulse 3s ease-in-out infinite reverse, rotate 15s linear infinite reverse;
+      opacity: 0.7;
+    }
+
+    .intro img {
+      position: absolute;
+      width: 60%;
+      height: auto;
+      top: 20%;
+      left: 20%;
+      filter: drop-shadow(0 0 10px rgba(255, 0, 51, 0.7));
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    .intro-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.3rem;
+      text-transform: uppercase;
+      color: #ff0033;
+      text-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+      opacity: 0;
+      animation: textFadeIn 1.5s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    .loading-bar {
+      width: 200px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff0033, #ff3300);
+      animation: load 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Main Content */
+    .main-content {
+      display: none;
+      height: 100%;
+      width: 100%;
+      background: radial-gradient(circle at center, #111111 0%, #000000 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-content.visible {
+      display: block;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 0, 51, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 51, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 20s linear infinite;
+      z-index: 0;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: contentFadeIn 1.5s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5rem;
+      color: #ff0033;
+      text-shadow: 0 0 15px rgba(255, 0, 51, 0.7);
+      position: relative;
+      animation: glitch 3s infinite;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #ff0033, transparent);
+      animation: underlinePulse 3s ease-in-out infinite;
+    }
+
+    p {
+      max-width: 600px;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      color: #b0b0b0;
+      font-size: 1.1rem;
+    }
+
+    .cta-button {
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, #ff0033 0%, #ff3300 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(255, 0, 51, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 0, 51, 0.8);
+      animation: buttonGlow 1s infinite alternate;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: all 0.5s ease;
+    }
+
+    .cta-button:hover::before {
+      left: 100%;
+    }
+
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 0, 51, 0.5);
+      border-radius: 50%;
+      animation: float linear infinite;
+      pointer-events: none;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.05); opacity: 0.9; }
+      100% { transform: scale(1); opacity: 0.7; }
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px rgba(255, 0, 51, 0.7)); }
+      to { filter: drop-shadow(0 0 20px rgba(255, 0, 51, 1)); }
+    }
+
+    @keyframes textFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes load {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    @keyframes gridMove {
+      from { background-position: 0 0; }
+      to { background-position: 50px 50px; }
+    }
+
+    @keyframes contentFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes underlinePulse {
+      0% { opacity: 0.3; width: 0%; left: 50%; }
+      50% { opacity: 1; width: 100%; left: 0%; }
+      100% { opacity: 0.3; width: 0%; left: 0%; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) translateX(20vw); opacity: 0; }
+    }
+
+    @keyframes glitch {
+      2% { text-shadow: 3px 0 0 #00fffc, -3px 0 0 #ff0033; }
+      4% { text-shadow: 3px 0 0 #00fffc, -3px 0 0 #ff0033; }
+      5% { text-shadow: none; }
+    }
+
+    @keyframes buttonGlow {
+      from { box-shadow: 0 0 20px rgba(255, 0, 51, 0.5); }
+      to { box-shadow: 0 0 40px rgba(255, 0, 51, 0.8); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="intro">
+    <div class="logo-container">
+      <div class="logo-outer"></div>
+      <div class="logo-inner"></div>
+      <img src="logo.png" alt="Safety Go Logo" />
+    </div>
+    <div class="intro-text">SAFETY GO</div>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+  </div>
+
+  <div class="main-content" id="mainContent">
+    <div class="grid-overlay"></div>
+    <div class="particles" id="particles"></div>
+    <div class="content-wrapper">
+      <h1 data-text="SAFETY_GO">SAFETY_GO</h1>
+      <p>Advanced Security Platform<br>Real-time Threat Detection • AI Surveillance • Emergency Response Network</p>
+      <button class="cta-button" onclick="location.href='signupPage.html'">GET STARTED</button>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced Particle System
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 100;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        const size = Math.random() * 3 + 1;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        particle.style.left = `${Math.random() * 100}vw`;
+        particle.style.bottom = '0';
+        
+        const duration = Math.random() * 10 + 10;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Mouse Interaction
+    document.addEventListener('mousemove', (e) => {
+      const particles = document.querySelectorAll('.particle');
+      particles.forEach(particle => {
+        const rect = particle.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        particle.style.transform = `translate(${x/20}px, ${y/20}px)`;
+      });
+    });
+
+    // System Initialization
+    setTimeout(() => {
+      document.querySelector(".intro").style.display = "none";
+      document.getElementById("mainContent").classList.add("visible");
+      createParticles();
+      
+      // Audio Feedback
+      const activateSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU');
+      activateSound.play();
+    }, 3500);
+
+    // Dynamic Background Effect
+    document.addEventListener('mousemove', (e) => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      document.documentElement.style.setProperty('--gradient-x', `${x * 100}%`);
+      document.documentElement.style.setProperty('--gradient-y', `${y * 100}%`);
+    });
+  </script>
+
+</body>
+</html>

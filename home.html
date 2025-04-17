@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disaster Alert System</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #ff4d4d;
+      --secondary: #2d9cdb;
+      --dark-bg: #0a0f16;
+      --card-bg: #1a1f2c;
+      --text-primary: #ffffff;
+      --text-secondary: #8c98a4;
+      --accent: #ff6b6b;
+      --success: #6bff8c;
+      --border: #2a3140;
+      --neon-blue: #2d9cdb;
+      --sidebar-width: 280px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: #131822;
+      padding: 2rem;
+      height: 100vh;
+      position: fixed;
+      left: -280px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-right: 1px solid var(--border);
+      z-index: 1000;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .main-content {
+      transition: margin-left 0.3s;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Profile Section Styles */
+    .profile-container {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .profile-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--neon-blue);
+      margin: 0 auto 1rem;
+      background: url('https://via.placeholder.com/80') center/cover;
+      position: relative;
+      box-shadow: 0 0 15px rgba(45, 156, 219, 0.3);
+    }
+
+    .profile-status {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #2ed573;
+      border: 2px solid var(--dark-bg);
+    }
+
+    .profile-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-role {
+      color: var(--neon-blue);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-menu {
+      margin-top: 2rem;
+    }
+
+    .nav-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-item:hover {
+      background: var(--card-bg);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--primary), #ff3030);
+      color: white;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 0;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      color: var(--text-primary);
+      letter-spacing: -0.05em;
+    }
+
+    .header h2 {
+      font-size: 1.1rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: alertPulse 1.5s infinite;
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .filter-container {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .filter-select {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-select:hover {
+      background: var(--border);
+    }
+
+    .buttons button {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .buttons button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+    }
+
+    .buttons button:first-child {
+      background: linear-gradient(135deg, var(--primary), #ff3030);
+      color: white;
+    }
+
+    .buttons button:last-child {
+      background: linear-gradient(135deg, var(--secondary), #1d7fb4);
+      color: white;
+    }
+
+    .cards, .footer-cards {
+      display: grid;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .cards {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .footer-cards {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .card.hidden {
+      display: none;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(255, 77, 77, 0.15);
+      border-color: var(--primary);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-bottom: 1px solid var(--border);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    .card h3 {
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+      font-size: 1.3rem;
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .action-text {
+      color: var(--success);
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    @keyframes alertPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="profile-container">
+    <a href="profile.html">
+        <div class="profile-image">
+            <div class="profile-status"></div>
+        </div>
+    </a>
+      <div class="profile-name">John Doe</div>
+      <div class="profile-role">Security Level IV</div>
+    </div>
+
+    <a href="dashboard.html">
+        <div class="nav-menu">
+        <div class="nav-item active">
+            <i class="fas fa-home"></i>
+            <p>Dashboard</p>
+        </div>
+    </a>
+    <a href="settings.html">
+        <div class="nav-item">
+            <i class="fas fa-cog"></i>
+            <p>System Settings</p>
+        </div>
+    </a>
+      <div class="nav-item">
+        <i class="fas fa-newspaper"></i>
+        <span>News</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-address-book"></i>
+        <span>Contacts</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-filter"></i>
+        <span>Filters</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="container">
+      <div class="header">
+        <div>
+          <h2>Emergency Alerts</h2>
+          <h1>Alert Settings</h1>
+        </div>
+        <div class="header-controls">
+          <select class="filter-select" id="alertFilter" onchange="filterAlerts(this.value)">
+            <option value="all">All Alerts</option>
+            <option value="weather">Weather</option>
+            <option value="security">Security</option>
+            <option value="system">System</option>
+            <option value="emergency">Emergency</option>
+          </select>
+          <div class="buttons">
+            <button onclick="location.href='setupAlert.html'"><i class="fas fa-bell"></i>New Alert</button>
+            <button onclick="location.href='map.html'"><i class="fas fa-map-marked"></i>New Map</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card" data-type="system">
+          <img src="https://via.placeholder.com/300x120?text=Alert+1" alt="Alert 1">
+          <div class="card-content">
+            <h3>Recent Alerts</h3>
+            <p>Customize Alert Preferences</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>View Details</p>
+          </div>
+        </div>
+
+        <div class="card" data-type="weather">
+          <img src="https://via.placeholder.com/300x120?text=Alert+2" alt="Alert 2">
+          <div class="card-content">
+            <h3>Weather Alerts</h3>
+            <p>Severe storm warnings active</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>View Details</p>
+          </div>
+        </div>
+
+        <div class="card" data-type="security">
+          <img src="https://via.placeholder.com/300x120?text=Alert+3" alt="Alert 3">
+          <div class="card-content">
+            <h3>Security Alerts</h3>
+            <p>Unauthorized access detected</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>View Details</p>
+          </div>
+        </div>
+
+        <div class="card" data-type="system">
+          <img src="https://via.placeholder.com/300x120?text=Alert+4" alt="Alert 4">
+          <div class="card-content">
+            <h3>System Alerts</h3>
+            <p>Server capacity at 92%</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>View Details</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-cards">
+        <div class="card" data-type="emergency">
+          <div class="card-content">
+            <h3>Emergency Response</h3>
+            <p>Recent Alerts</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>View Plans</p>
+          </div>
+        </div>
+        
+        <div class="card" data-type="emergency">
+          <div class="card-content">
+            <h3>Alert Groups</h3>
+            <p>3 active groups</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>Manage Groups</p>
+          </div>
+        </div>
+
+        <div class="card" data-type="emergency">
+          <div class="card-content">
+            <h3>Emergency Plans</h3>
+            <p>2 active plans</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>View Plans</p>
+          </div>
+        </div>
+
+        <div class="card" data-type="emergency">
+          <div class="card-content">
+            <h3>Crisis Management</h3>
+            <p>Protocols activated</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>Take Action</p>
+          </div>
+        </div>
+
+        <div class="card" data-type="emergency">
+          <div class="card-content">
+            <h3>Emergency Contact</h3>
+            <p>12 registered contacts</p>
+            <p class="action-text"><i class="fas fa-arrow-right"></i>View Contacts</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sidebar = document.querySelector('.sidebar');
+    let hideTimeout;
+    let isMouseInSidebar = false;
+
+    // Show sidebar when mouse approaches left edge
+    document.addEventListener('mousemove', (e) => {
+      const mouseX = e.clientX;
+      const sidebarVisible = sidebar.classList.contains('active');
+
+      if (mouseX < 50 && !sidebarVisible) {
+        sidebar.classList.add('active');
+        clearTimeout(hideTimeout);
+      }
+
+      // Hide sidebar when mouse moves away
+      if (sidebarVisible && mouseX > 280 && !isMouseInSidebar) {
+        hideTimeout = setTimeout(() => {
+          sidebar.classList.remove('active');
+        }, 300);
+      }
+    });
+
+    // Handle sidebar hover states
+    sidebar.addEventListener('mouseenter', () => {
+      isMouseInSidebar = true;
+      clearTimeout(hideTimeout);
+    });
+
+    sidebar.addEventListener('mouseleave', () => {
+      isMouseInSidebar = false;
+    });
+
+    // Filter functionality
+    function filterAlerts(filterType) {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        const cardType = card.dataset.type;
+        card.classList.toggle('hidden', !(filterType === 'all' || cardType === filterType));
+        if (!card.classList.contains('hidden')) {
+          card.style.animation = 'fadeIn 0.5s ease';
+        }
+      });
+    }
+
+    filterAlerts('all');
+  </script>
+</body>
+</html>

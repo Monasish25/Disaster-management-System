@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Alert Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0a0e14;
+            --card-bg: #1a1f27;
+            --accent: #ff6b6b;
+            --text-primary: #e6e6e6;
+            --text-secondary: #8a8f98;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container-main {
+            max-width: 1440px;
+            min-height: 90vh;
+            margin: auto;
+            animation: scaleIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #2d333b;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: slideUp 0.6s forwards;
+        }
+
+        .editable-field {
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .editable-field:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .editable-field.editing {
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .medical-tag {
+            background: rgba(255,107,107,0.2);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+
+        .priority-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .avatar-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            animation: avatarFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.96); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,107,107,0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255,107,107,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); }
+        }
+
+        @keyframes avatarFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .btn-custom {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+        }
+
+        .contact-card:hover {
+            transform: translateX(10px);
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-main px-4 py-5">
+        <!-- Profile Header -->
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-upload">
+                        <input type="file" id="avatarInput" accept="image/*" hidden>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b'/%3E%3C/svg%3E" 
+                             class="avatar-image" 
+                             alt="Profile"
+                             id="avatarImage">
+                    </div>
+                    <div>
+                        <h1 class="profile-name mb-0 editable-field" contenteditable="true"
+                            data-field="profileName">Emergency Profile</h1>
+                        <p class="text-secondary mt-1">Last updated: <span class="text-accent">Just now</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-custom" id="saveProfile">
+                    <i class="bi bi-cloud-upload"></i> Save Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-lg-8">
+                <!-- Active Alerts -->
+                <div class="card alert-card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="priority-indicator bg-danger"></span> Active Alerts</h5>
+                        <div class="alert-list mt-3">
+                            <div class="alert-item d-flex align-items-center gap-3">
+                                <i class="bi bi-cloud-lightning-rain fs-4 text-accent"></i>
+                                <div>
+                                    <div class="fw-bold">Severe Thunderstorm Warning</div>
+                                    <small class="text-secondary">Valid until 19:00 | 5km radius</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-bell"></i> Notification Settings</h5>
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="smsAlerts" checked>
+                                    <label class="form-check-label" for="smsAlerts">SMS Alerts</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="emailAlerts">
+                                    <label class="form-check-label" for="emailAlerts">Email Alerts</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Alert Frequency</label>
+                                <select class="form-select">
+                                    <option>Immediate</option>
+                                    <option>Hourly Digest</option>
+                                    <option>Daily Summary</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical Information -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-heart-pulse"></i> Medical Information</h5>
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-4">
+                                <div class="editable-field" data-field="bloodGroup">
+                                    <span class="text-secondary">Blood Group:</span>
+                                    <span class="text-accent" id="bloodGroupValue">O+</span>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="editable-field" data-field="healthIssues">
+                                    <span class="text-secondary">Health Issues:</span>
+                                    <div id="healthIssuesValue" class="d-inline">
+                                        <span class="medical-tag">Asthma</span>
+                                        <span class="medical-tag">Diabetes</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-4">
+                <!-- Emergency Contacts -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-person-lines-fill"></i> Emergency Contacts</h5>
+                        <div class="list-group mt-3" id="contactsList">
+                            <!-- Mother -->
+                            <div class="list-group-item contact-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="editable-field" data-field="contactName">
+                                            <span class="fw-bold">Sarah Johnson</span>
+                                        </div>
+                                        <div class="editable-field" data-field="contactNumber">
+                                            <small class="text-secondary">+1 234 567 890</small>
+                                        </div>
+                                        <div class="editable-field" data-field="relationship">
+                                            <small class="text-accent">Mother</small>
+                                        </div>
+                                    </div>
+                                    <div class="editable-field" data-field="contactLocation">
+                                        <small class="text-accent">📍 Home</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-secondary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                            <i class="bi bi-plus-lg"></i> Add Contact
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Saved Locations -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-geo-alt"></i> Saved Locations</h5>
+                        <div class="list-group mt-3" id="locationsList">
+                            <div class="list-group-item contact-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="editable-field" data-field="locationName">
+                                            <span class="fw-bold">Home</span>
+                                        </div>
+                                        <div class="editable-field" data-field="locationAddress">
+                                            <small class="text-secondary">12.3456, 78.9012</small>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-custom">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div class="modal fade" id="addContactModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Emergency Contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="newContactName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="newContactNumber">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Relationship</label>
+                        <select class="form-select" id="newContactRelationship">
+                            <option>Mother</option>
+                            <option>Father</option>
+                            <option>Brother</option>
+                            <option>Sister</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Location</label>
+                        <select class="form-select" id="newContactLocation">
+                            <option>📍 Home</option>
+                            <option>🏢 Work</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-custom" id="saveNewContact">Save Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class EditableManager {
+            constructor() {
+                this.fields = {
+                    profileName: { element: document.querySelector('[data-field="profileName"]'), type: 'text' },
+                    bloodGroup: { element: document.getElementById('bloodGroupValue'), type: 'select', options: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] },
+                    healthIssues: { element: document.getElementById('healthIssuesValue'), type: 'tags' },
+                    contactName: { element: document.querySelector('[data-field="contactName"] .fw-bold'), type: 'text' },
+                    contactNumber: { element: document.querySelector('[data-field="contactNumber"] .text-secondary'), type: 'tel' },
+                    relationship: { element: document.querySelector('[data-field="relationship"] .text-accent'), type: 'select', options: ['Mother', 'Father', 'Brother', 'Sister', 'Other'] },
+                    contactLocation: { element: document.querySelector('[data-field="contactLocation"] .text-accent'), type: 'select', options: ['📍 Home', '🏢 Work', 'Other'] },
+                    locationName: { element: document.querySelector('[data-field="locationName"] .fw-bold'), type: 'text' },
+                    locationAddress: { element: document.querySelector('[data-field="locationAddress"] .text-secondary'), type: 'text' }
+                };
+
+                this.init();
+            }
+
+            init() {
+                document.querySelectorAll('.editable-field').forEach(field => {
+                    field.addEventListener('click', (e) => {
+                        const fieldName = field.dataset.field;
+                        if (!field.classList.contains('editing')) {
+                            this.startEdit(fieldName);
+                        }
+                    });
+                });
+            }
+
+            startEdit(fieldName) {
+                const config = this.fields[fieldName];
+                const parent = config.element.parentElement;
+                parent.classList.add('editing');
+
+                let inputElement;
+                switch(config.type) {
+                    case 'select':
+                        inputElement = this.createSelect(config.options, config.element.textContent);
+                        break;
+                    case 'tags':
+                        inputElement = this.createTagEditor(config.element);
+                        break;
+                    case 'tel':
+                        inputElement = this.createTelInput(config.element.textContent);
+                        break;
+                    default:
+                        inputElement = this.createTextInput(config.element.textContent);
+                }
+
+                parent.replaceChild(inputElement, config.element);
+                inputElement.focus();
+
+                const saveHandler = (e) => {
+                    if (e.key === 'Enter' || e.type === 'blur') {
+                        this.saveEdit(fieldName, inputElement.value || inputElement.textContent);
+                        parent.replaceChild(config.element, inputElement);
+                        parent.classList.remove('editing');
+                        document.removeEventListener('keydown', saveHandler);
+                    }
+                };
+
+                inputElement.addEventListener('blur', saveHandler);
+                inputElement.addEventListener('keydown', saveHandler);
+            }
+
+            createTextInput(value) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-control form-control-sm bg-dark text-white';
+                input.value = value;
+                return input;
+            }
+
+            createTelInput(value) {
+                const input = this.createTextInput(value);
+                input.type = 'tel';
+                input.pattern = "[+0-9]{8,15}";
+                return input;
+            }
+
+            createSelect(options, current) {
+                const select = document.createElement('select');
+                select.className = 'form-select form-select-sm bg-dark text-white';
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    option.selected = opt === current;
+                    select.appendChild(option);
+                });
+                return select;
+            }
+
+            createTagEditor(container) {
+                const editor = document.createElement('div');
+                editor.className = 'tag-editor';
+                const tags = Array.from(container.querySelectorAll('.medical-tag'))
+                    .map(tag => tag.textContent);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-control form-control-sm bg-dark text-white';
+                input.placeholder = 'Add health issues (comma separated)';
+                input.value = tags.join(', ');
+                
+                editor.appendChild(input);
+                return editor;
+            }
+
+            saveEdit(fieldName, value) {
+                const config = this.fields[fieldName];
+                if (config.type === 'tags') {
+                    const tags = value.split(',').map(t => t.trim());
+                    config.element.innerHTML = tags.map(t => 
+                        `<span class="medical-tag">${t}</span>`
+                    ).join('');
+                } else {
+                    config.element.textContent = value;
+                }
+            }
+        }
+
+        // Initialize Editable Manager
+        const editableManager = new EditableManager();
+
+        // Avatar Upload
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarImage = document.getElementById('avatarImage');
+        avatarImage.addEventListener('click', () => avatarInput.click());
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    avatarImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Add New Contact
+        document.getElementById('saveNewContact').addEventListener('click', () => {
+            const name = document.getElementById('newContactName').value;
+            const number = document.getElementById('newContactNumber').value;
+            const relationship = document.getElementById('newContactRelationship').value;
+            const location = document.getElementById('newContactLocation').value;
+
+            const newContact = document.createElement('div');
+            newContact.className = 'list-group-item contact-card';
+            newContact.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="editable-field" data-field="contactName">
+                            <span class="fw-bold">${name}</span>
+                        </div>
+                        <div class="editable-field" data-field="contactNumber">
+                            <small class="text-secondary">${number}</small>
+                        </div>
+                        <div class="editable-field" data-field="relationship">
+                            <small class="text-accent">${relationship}</small>
+                        </div>
+                    </div>
+                    <div class="editable-field" data-field="contactLocation">
+                        <small class="text-accent">${location}</small>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('contactsList').appendChild(newContact);
+            bootstrap.Modal.getInstance(document.getElementById('addContactModal')).hide();
+        });
+
+        // Save Profile
+        document.getElementById('saveProfile').addEventListener('click', function() {
+            this.innerHTML = `<i class="bi bi-check2"></i> Profile Saved!`;
+            setTimeout(() => {
+                this.innerHTML = `<i class="bi bi-cloud-upload"></i> Save Profile`;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
